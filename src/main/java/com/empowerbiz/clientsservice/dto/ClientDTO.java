@@ -11,15 +11,15 @@ import lombok.Setter;
 
 public class ClientDTO{
 
-private long clientIdDTO;
+private long clientId;
 
-private String clientNameDTO;
+private String clientName;
 
-private String emailDTO;
+private String email;
 
-private String addressDTO;
+private String address;
 
-private String phoneDTO;
+private String phone;
     
 
 

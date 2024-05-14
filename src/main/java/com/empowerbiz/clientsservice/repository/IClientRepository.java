@@ -13,6 +13,5 @@ public interface IClientRepository {
     Client update(Client client) throws Exception;
     List<Client> readAll() throws Exception;
     Client readById(long id) throws Exception;
-    void delete(long id) throws Exception;
-
+    int delete(long id) throws Exception;
 }
