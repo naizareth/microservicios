@@ -9,9 +9,10 @@ import com.empowerbiz.clientsservice.model.Client;
 
 public interface IClientRepository {
 
-  Client save(Client client) throws Exception;
+  Client create(Client client) throws Exception;
     Client update(Client client) throws Exception;
-    List<Client> readAll() throws Exception;
-    Client readById(long id) throws Exception;
-    int delete(long id) throws Exception;
+    List<Client> findAll(Long clientId) throws Exception;
+    Client findById(long clientId) throws Exception;
+    int delete(long clientId) throws Exception;
+
 }
