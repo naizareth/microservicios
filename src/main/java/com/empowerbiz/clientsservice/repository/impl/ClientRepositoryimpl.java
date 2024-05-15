@@ -1,5 +1,4 @@
 package com.empowerbiz.clientsservice.repository.impl;
-
 import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ public class ClientRepositoryimpl implements IClientRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Client create(Client client) throws Exception {
+    public Client save(Client client) throws Exception {
         String sql = "INSERT INTO clients (clientname, email,address,phone) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, client.getClientName(), client.getEmail(), client.getAddress(), client.getPhone());
         return client;

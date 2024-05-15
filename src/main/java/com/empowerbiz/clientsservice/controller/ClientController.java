@@ -1,4 +1,5 @@
-package com.empowerbiz.clientsservice.controller;
+ package com.empowerbiz.clientsservice.controller;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
@@ -18,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.empowerbiz.clientsservice.dto.ClientDTO;
 import com.empowerbiz.clientsservice.exception.ModelNotFoundException;
 import com.empowerbiz.clientsservice.model.Client;
-import com.empowerbiz.clientsservice.service.IClientService;
+import com.empowerbiz.clientsservice.repository.IClientRepository;
 
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
 
     @Autowired
-    private IClientService clientService;
+    private IClientRepository clientRepository;
 
     @Autowired
     private ModelMapper mapper;
@@ -33,7 +34,7 @@ public class ClientController {
     @GetMapping
     public ResponseEntity<List<ClientDTO>> getClients(@RequestParam(required = false) Long clientId) {
         try {
-            List<Client> clients = clientService.findAll(clientId);
+            List<Client> clients = clientRepository.findAll(clientId);
             List<ClientDTO> clientDTOs = clients.stream()
                     .map(client -> mapper.map(client, ClientDTO.class))
                     .collect(Collectors.toList());
@@ -46,25 +47,25 @@ public class ClientController {
     @DeleteMapping("/{id}")
 
     public ResponseEntity<Void> delete(@PathVariable("clientId") long clientId) throws Exception {
-        Client obj = clientService.findById(clientId);
+        Client obj = clientRepository.findById(clientId);
 
         if (obj == null) {
             throw new ModelNotFoundException("ID NOT FOUND: " + clientId);
         }
-        clientService.delete(clientId);
+        clientRepository.delete(clientId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
 
      @PostMapping
     public ResponseEntity<ClientDTO> create(@Validated @RequestBody ClientDTO dto) throws Exception{
-        Client obj = clientService.create(mapper.map(dto, Client.class));
+        Client obj = clientRepository.save(mapper.map(dto, Client.class));
         return new ResponseEntity<>(mapper.map(obj, ClientDTO.class), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<ClientDTO> update(@Validated @RequestBody ClientDTO dto) throws Exception{
-        Client obj = clientService.update(mapper.map(dto, Client.class));
+        Client obj = clientRepository.update(mapper.map(dto, Client.class));
         return new ResponseEntity<>(mapper.map(obj, ClientDTO.class), HttpStatus.OK);
     }
 
