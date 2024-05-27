@@ -21,22 +21,22 @@ import org.springframework.web.bind.annotation.RestController;
 import com.empowerbiz.clientsservice.dto.ClientDTO;
 import com.empowerbiz.clientsservice.exception.ModelNotFoundException;
 import com.empowerbiz.clientsservice.model.Client;
-import com.empowerbiz.clientsservice.repository.IClientRepository;
+import com.empowerbiz.clientsservice.service.IClientService;
 
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
 
     @Autowired
-    private IClientRepository clientRepository;
+    private IClientService service;
 
     @Autowired
     private ModelMapper mapper;
 
     @GetMapping
-    public ResponseEntity<List<ClientDTO>> getClients(@RequestParam(required = false) Long clientId) {
+    public ResponseEntity<List<ClientDTO>> getClients(@RequestParam(required = false) Long clientId) throws Exception {
         try {
-            List<Client> clients = clientRepository.findAll(clientId);
+            List<Client> clients = service.findAll(clientId);
             List<ClientDTO> clientDTOs = clients.stream()
                     .map(client -> mapper.map(client, ClientDTO.class))
                     .collect(Collectors.toList());
@@ -50,10 +50,10 @@ public class ClientController {
 public ResponseEntity<?> delete(@PathVariable("id") long clientId) {
     try {
         // Buscar el cliente por su ID
-        clientRepository.findById(clientId);
+        service.findById(clientId);
         
         // Si el cliente existe, proceder a eliminarlo
-        clientRepository.delete(clientId);
+        service.delete(clientId);
         
         // Devolver una ResponseEntity con el código de estado 204 (No Content) y un objeto JSON con el mensaje
         Map<String, String> response = new HashMap<>();
@@ -71,7 +71,7 @@ public ResponseEntity<?> delete(@PathVariable("id") long clientId) {
     @PostMapping
     public ResponseEntity<?> create(@Validated @RequestBody ClientDTO dto) {
         try {
-            Client existingClient = clientRepository.findByEmail(dto.getEmail());
+            Client existingClient = service.findByEmail(dto.getEmail());
 
             if (existingClient != null) {
                 // Si ya existe un cliente con el mismo correo electrónico, lanzar una excepción con el mensaje de error
@@ -79,7 +79,7 @@ public ResponseEntity<?> delete(@PathVariable("id") long clientId) {
             }
             
             // Si no existe un cliente con el mismo correo electrónico, proceder a crear uno nuevo
-            Client obj = clientRepository.save(mapper.map(dto, Client.class));
+            Client obj = service.save(mapper.map(dto, Client.class));
             // Devolver un ResponseEntity con el objeto creado
             return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(obj, ClientDTO.class));
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public ResponseEntity<?> delete(@PathVariable("id") long clientId) {
 
     @PutMapping
     public ResponseEntity<ClientDTO> update(@Validated @RequestBody ClientDTO dto) throws Exception{
-        Client obj = clientRepository.update(mapper.map(dto, Client.class));
+        Client obj = service.update(mapper.map(dto, Client.class));
         return new ResponseEntity<>(mapper.map(obj, ClientDTO.class), HttpStatus.OK);
     }
 
