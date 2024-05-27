@@ -58,7 +58,7 @@ public ResponseEntity<?> delete(@PathVariable("id") long clientId) {
         // Devolver una ResponseEntity con el código de estado 204 (No Content) y un objeto JSON con el mensaje
         Map<String, String> response = new HashMap<>();
         response.put("message", "Cliente eliminado exitosamente");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     } catch (ModelNotFoundException e) {
         // Capturar la excepción ModelNotFoundException y devolver una ResponseEntity con el código de estado 404 (Not Found) y un objeto JSON con el mensaje de error
         Map<String, String> errorResponse = new HashMap<>();
