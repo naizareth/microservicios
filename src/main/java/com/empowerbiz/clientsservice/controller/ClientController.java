@@ -1,6 +1,8 @@
  package com.empowerbiz.clientsservice.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,24 +45,47 @@ public class ClientController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @DeleteMapping("/{id}")
-
-    public ResponseEntity<Void> delete(@PathVariable("clientId") long clientId) throws Exception {
-        Client obj = clientRepository.findById(clientId);
-
-        if (obj == null) {
-            throw new ModelNotFoundException("ID NOT FOUND: " + clientId);
-        }
+     
+   @DeleteMapping("/{id}")
+public ResponseEntity<?> delete(@PathVariable("id") long clientId) {
+    try {
+        // Buscar el cliente por su ID
+        clientRepository.findById(clientId);
+        
+        // Si el cliente existe, proceder a eliminarlo
         clientRepository.delete(clientId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
+        
+        // Devolver una ResponseEntity con el código de estado 204 (No Content) y un objeto JSON con el mensaje
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Cliente eliminado exitosamente");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    } catch (ModelNotFoundException e) {
+        // Capturar la excepción ModelNotFoundException y devolver una ResponseEntity con el código de estado 404 (Not Found) y un objeto JSON con el mensaje de error
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+}
 
-     @PostMapping
-    public ResponseEntity<ClientDTO> create(@Validated @RequestBody ClientDTO dto) throws Exception{
-        Client obj = clientRepository.save(mapper.map(dto, Client.class));
-        return new ResponseEntity<>(mapper.map(obj, ClientDTO.class), HttpStatus.CREATED);
+    
+    @PostMapping
+    public ResponseEntity<?> create(@Validated @RequestBody ClientDTO dto) {
+        try {
+            Client existingClient = clientRepository.findByEmail(dto.getEmail());
+
+            if (existingClient != null) {
+                // Si ya existe un cliente con el mismo correo electrónico, lanzar una excepción con el mensaje de error
+                throw new Exception("Ya existe un cliente con el mismo correo electrónico");
+            }
+            
+            // Si no existe un cliente con el mismo correo electrónico, proceder a crear uno nuevo
+            Client obj = clientRepository.save(mapper.map(dto, Client.class));
+            // Devolver un ResponseEntity con el objeto creado
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(obj, ClientDTO.class));
+        } catch (Exception e) {
+            // Capturar cualquier excepción y devolver un ResponseEntity con un código de estado de error y el mensaje de la excepción
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+        }
     }
 
     @PutMapping
