@@ -1,6 +1,9 @@
 package com.empowerbiz.clientsservice.repository.impl;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -12,7 +15,7 @@ import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.repository.IClientRepository;
 
 @Repository
-public class ClientRepositoryimpl implements IClientRepository {
+public class ClientRepositoryImpl implements IClientRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -33,39 +36,37 @@ public class ClientRepositoryimpl implements IClientRepository {
     @Override
     public List<Client> findAll(Long clientId) {
         if (clientId != null) {
-            return Collections.singletonList(findById(clientId));
+            Optional<Client> clientOptional = findById(clientId);
+            return clientOptional.map(Collections::singletonList).orElse(Collections.emptyList());
         } else {
             String sql = "SELECT * FROM clients";
             return jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Client.class));
         }
     }
-
+    
     @Override
-    public Client findById(long clientId)  {
-
+    public Optional<Client> findById(long clientId) {
+        String sql = "SELECT * FROM clients WHERE clientId = ?";
         try {
-            String sql = "SELECT * FROM clients WHERE clientId = ?";
-            return jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), clientId);
-            
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), clientId));
         } catch (EmptyResultDataAccessException e) {
-            throw new ModelNotFoundException("Cliente no encontrado");
+            return Optional.empty();
         }
     }
-    @Override
-    public Client findByEmail(String email) {
-
-        
-            Client client = jdbcTemplate.queryForObject("SELECT * FROM clients WHERE email=?",
-                BeanPropertyRowMapper.newInstance(Client.class), email);
-
-            return client;
-       
-  }
 
     @Override
-    public int delete(long clientId)  {
+    public Optional<Client> findByEmail(String email) {
+        String sql = "SELECT * FROM clients WHERE email = ?";
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), email));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public int delete(long clientId) {
         String sql = "DELETE FROM clients WHERE clientId = ?";
         return jdbcTemplate.update(sql, clientId);
     }
-
 }
