@@ -10,19 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import com.empowerbiz.clientsservice.dto.ClientDTO;
 import com.empowerbiz.clientsservice.exception.ModelNotFoundException;
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.service.IClientService;
+import com.empowerbiz.clientsservice.validators.ClientValidator;
 
 @RestController
 @RequestMapping("/clients")
@@ -33,6 +27,9 @@ public class ClientController {
 
     @Autowired
     private ModelMapper mapper;
+
+    @Autowired
+    private ClientValidator clientValidator;
 
     @GetMapping
     public ResponseEntity<List<ClientDTO>> getClients(@RequestParam(required = false) Long clientId) throws Exception {
@@ -50,20 +47,17 @@ public class ClientController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable("id") long clientId) {
         try {
-            Optional<Client> client = service.findById(clientId);
-            if (client.isEmpty()) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "Cliente no encontrado");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
+            // Validar que el cliente exista antes de eliminarlo
+            clientValidator.validateClientExists(clientId);
 
-            // Si el cliente existe, proceder a eliminarlo
+            // Proceder a eliminar el cliente
             service.delete(clientId);
 
-            // Devolver una ResponseEntity con el código de estado 204 (No Content) y un
+            // Devolver una respuesta con un mensaje de éxito
             Map<String, String> response = new HashMap<>();
             response.put("message", "Cliente eliminado exitosamente");
             return ResponseEntity.status(HttpStatus.OK).body(response);
+
         } catch (ModelNotFoundException e) {
             throw new ModelNotFoundException(e.getMessage());
         }
@@ -72,24 +66,15 @@ public class ClientController {
     @PostMapping
     public ResponseEntity<Object> create(@Validated @RequestBody ClientDTO dto) {
         try {
-            Optional<Client> existingClientOptional = service.findByEmail(dto.getEmail());
-
-            if (existingClientOptional.isPresent()) {
-                throw new Exception("Ya existe un cliente con el mismo correo electrónico");
-            }
-
-            service.save(mapper.map(dto, Client.class));
-
-            // Busca el cliente recién creado por su nombre
-            Optional<Client> createdClient = service.findByEmail(dto.getEmail());
-
-            // Verifica si se encontró el producto recién creado
-            if (createdClient.isEmpty()) {
-                throw new ModelNotFoundException("No se pudo encontrar el producto recién creado");
-            }
+            // Validar que el correo electrónico no esté en uso
+            clientValidator.validateEmailNotInUse(dto.getEmail());
+            
+            // Guardar el nuevo cliente
+            Client createdClient = service.save(mapper.map(dto, Client.class));
 
             // Devolver un ResponseEntity con el objeto creado
             return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(createdClient, ClientDTO.class));
+
         } catch (Exception e) {
             throw new ModelNotFoundException(e.getMessage());
         }
@@ -98,29 +83,22 @@ public class ClientController {
     @PutMapping("/{id}")
     public ResponseEntity<ClientDTO> update(@PathVariable("id") long clientId, @Validated @RequestBody ClientDTO dto) {
         try {
-            // Buscar el cliente existente por su ID
-            Optional<Client> existingClientOptional = service.findById(clientId);
+            // Validar que el cliente exista
+            Client existingClient = clientValidator.validateClientExists(clientId);
 
-            // Verificar si el cliente existe
-            if (existingClientOptional.isEmpty()) {
-                throw new ModelNotFoundException("Cliente no encontrado");
-            }
+            // Verificar la unicidad del correo electrónico
+            clientValidator.checkEmailUniqueness(dto.getEmail(), existingClient, clientId);
 
-            Client existingClient = existingClientOptional.get();
-            // Si el correo electrónico actualizado es diferente del correo electrónico
-            // original
-            if (!existingClient.getEmail().equals(dto.getEmail())) {
-                // Verificar si ya existe un cliente con el nuevo correo electrónico
-                Optional<Client> existingWithEmail = service.findByEmail(dto.getEmail());
-                if (existingWithEmail.isPresent() && existingWithEmail.get().getClientId() != clientId) {
-                    throw new ModelNotFoundException("Ya existe un cliente con el mismo correo electrónico");
-                }
-            }
+            // Mapear los datos del DTO al objeto Client
+            Client mapClient = mapper.map(dto, Client.class);
 
-            // Actualizar el cliente
-            Client updatedClient = mapper.map(dto, Client.class);
-            updatedClient.setClientId(clientId);
-            Client obj = service.update(updatedClient);
+            // Establecer el ID del cliente en el objeto Client
+            mapClient.setClientId(clientId);
+
+            // Actualizar el cliente en el servicio
+            Client obj = service.update(mapClient);
+
+            // Devolver la respuesta HTTP con el cliente actualizado mapeado a DTO
             return ResponseEntity.ok().body(mapper.map(obj, ClientDTO.class));
         } catch (Exception e) {
             throw new ModelNotFoundException(e.getMessage());

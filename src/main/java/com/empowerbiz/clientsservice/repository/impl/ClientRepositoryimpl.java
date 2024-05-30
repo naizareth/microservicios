@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.empowerbiz.clientsservice.exception.ModelNotFoundException;
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.repository.IClientRepository;
 
@@ -28,8 +27,9 @@ public class ClientRepositoryImpl implements IClientRepository {
 
     @Override
     public Client update(Client client) {
-        String sql = "UPDATE clients SET clientname = ?, email = ? WHERE clientid = ?";
-        jdbcTemplate.update(sql, client.getClientName(), client.getEmail(), client.getClientId());
+        System.out.println(client.getClientId());
+        String sql = "UPDATE clients SET clientname = ?, email = ?, address = ? , phone = ? WHERE clientid = ?";
+        jdbcTemplate.update(sql, client.getClientName(), client.getEmail(), client.getAddress(), client.getPhone(), client.getClientId());
         return client;
     }
 
