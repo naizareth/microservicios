@@ -16,15 +16,16 @@ import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.service.IClientService;
 import com.empowerbiz.clientsservice.validators.ClientValidator;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
 
-    @Autowired
-    private IClientService service;
+    private final IClientService service;
 
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
     private ClientValidator clientValidator;
 
@@ -55,7 +56,7 @@ public class ClientController {
     public ResponseEntity<Object> create(@Validated @RequestBody ClientDTO dto) {
         // Validar que el correo electrónico no esté en uso
         clientValidator.validateEmailNotInUse(dto.getEmail());
-        
+
         // Guardar el nuevo cliente
         Client createdClient = service.save(mapper.map(dto, Client.class));
 

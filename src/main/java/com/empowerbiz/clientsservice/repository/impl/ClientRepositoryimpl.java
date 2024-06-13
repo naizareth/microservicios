@@ -13,10 +13,14 @@ import org.springframework.stereotype.Repository;
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.repository.IClientRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Repository
 public class ClientRepositoryImpl implements IClientRepository {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+    private final JdbcTemplate jdbcTemplate;
+    
 
     @Override
     public Client save(Client client) {
@@ -29,7 +33,8 @@ public class ClientRepositoryImpl implements IClientRepository {
     public Client update(Client client) {
         System.out.println(client.getClientId());
         String sql = "UPDATE clients SET clientname = ?, email = ?, address = ? , phone = ? WHERE clientid = ?";
-        jdbcTemplate.update(sql, client.getClientName(), client.getEmail(), client.getAddress(), client.getPhone(), client.getClientId());
+        jdbcTemplate.update(sql, client.getClientName(), client.getEmail(), client.getAddress(), client.getPhone(),
+                client.getClientId());
         return client;
     }
 
@@ -43,12 +48,13 @@ public class ClientRepositoryImpl implements IClientRepository {
             return jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Client.class));
         }
     }
-    
+
     @Override
     public Optional<Client> findById(long clientId) {
         String sql = "SELECT * FROM clients WHERE clientId = ?";
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), clientId));
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), clientId));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -58,7 +64,8 @@ public class ClientRepositoryImpl implements IClientRepository {
     public Optional<Client> findByEmail(String email) {
         String sql = "SELECT * FROM clients WHERE email = ?";
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), email));
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Client.class), email));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

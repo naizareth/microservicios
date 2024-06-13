@@ -3,16 +3,18 @@ package com.empowerbiz.clientsservice.validators;
 import com.empowerbiz.clientsservice.exception.ModelNotFoundException;
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.service.IClientService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Component
 public class ClientValidator {
 
-    @Autowired
-    private IClientService service;
+    private final IClientService service;
 
     // Verifica la unicidad del correo electrónico para un cliente existente
     public void checkEmailUniqueness(String email, Client existingClient, long clientId) {
