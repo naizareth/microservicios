@@ -1,4 +1,6 @@
 package com.empowerbiz.clientsservice.dto;
+import com.empowerbiz.clientsservice.util.Mesagges;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,18 +18,18 @@ public class ClientDTO{
    
     private long clientId;
 
-    @NotBlank(message = "El nombre del cliente no puede estar en blanco")
+    @NotBlank(message = Mesagges.EMPTY_NAME)
     private String clientName;
 
-    @Email(message = "El correo electrónico debe ser válido")
-    @NotBlank(message = "El correo electrónico no puede estar en blanco")
-    @NotNull(message = "El correo electrónico no puede estar en blanco")
+    @Email(message = Mesagges.EMAIL_INVALID)
+    @NotBlank(message = Mesagges.EMPTY_EMAIL)
+    @NotNull(message = Mesagges.EMPTY_EMAIL)
     private String email;
 
-    @NotBlank(message = "La dirección no puede estar en blanco")
+    @NotBlank(message = Mesagges.EMPTY_ADDRESS)
     private String address;
 
-    @NotBlank(message = "El teléfono no puede estar en blanco")
+    @NotBlank(message = Mesagges.EMPTY_PHONE)
     private String phone;
 
 }

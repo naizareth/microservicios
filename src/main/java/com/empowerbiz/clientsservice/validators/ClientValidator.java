@@ -3,6 +3,7 @@ package com.empowerbiz.clientsservice.validators;
 import com.empowerbiz.clientsservice.exception.ModelNotFoundException;
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.service.IClientService;
+import com.empowerbiz.clientsservice.util.Mesagges;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Component
 public class ClientValidator {
 
+
     private final IClientService service;
 
     // Verifica la unicidad del correo electrónico para un cliente existente
@@ -22,7 +24,7 @@ public class ClientValidator {
         if (!existingClient.getEmail().equals(email)) {
             Optional<Client> existingWithEmail = service.findByEmail(email);
             if (existingWithEmail.isPresent() && existingWithEmail.get().getClientId() != clientId) {
-                throw new ModelNotFoundException("Ya existe un cliente con el mismo correo electrónico");
+                throw new ModelNotFoundException(Mesagges.DUPLICATE_EMAIL);
             }
         }
     }
@@ -31,7 +33,7 @@ public class ClientValidator {
     public void validateEmailNotInUse(String email) {
         Optional<Client> existingClientOptional = service.findByEmail(email);
         if (existingClientOptional.isPresent()) {
-            throw new ModelNotFoundException("Ya existe un cliente con el mismo correo electrónico");
+            throw new ModelNotFoundException(Mesagges.DUPLICATE_EMAIL);
         }
     }
 
@@ -39,7 +41,7 @@ public class ClientValidator {
     public Client validateClientExists(long clientId) {
         Optional<Client> client = service.findById(clientId);
         if (client.isEmpty()) {
-            throw new ModelNotFoundException("Cliente no encontrado");
+            throw new ModelNotFoundException(Mesagges.NOT_FOUND);
         }
         return client.get();
     }

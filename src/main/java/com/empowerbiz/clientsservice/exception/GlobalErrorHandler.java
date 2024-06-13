@@ -13,6 +13,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.empowerbiz.clientsservice.util.Mesagges;
+
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -22,7 +24,7 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllException(Exception ex, WebRequest req) {
-        ErrorResponse res = new ErrorResponse(LocalDateTime.now(), "Ocurrió un error inesperado",
+        ErrorResponse res = new ErrorResponse(LocalDateTime.now(), Mesagges.HANDLEALLEXCEPTION,
                 req.getDescription(false));
         return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -35,7 +37,7 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException(SQLException ex, WebRequest req) {
-        ErrorResponse res = new ErrorResponse(LocalDateTime.now(), "Error en la base de datos",
+        ErrorResponse res = new ErrorResponse(LocalDateTime.now(), Mesagges.ERROR_DATABASE,
                 req.getDescription(false));
         return new ResponseEntity<>(res, HttpStatus.CONFLICT);
     }
@@ -57,7 +59,7 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, @NonNull HttpHeaders headers,
             HttpStatusCode status, WebRequest request) {
         ErrorResponse res = new ErrorResponse(LocalDateTime.now(),
-                "No se encontró el recurso solicitado.",
+                Mesagges.RESOURCE_NOT_FOUND,
                 request.getDescription(false));
         return handleExceptionInternal(ex, res, headers, status, request);
     }

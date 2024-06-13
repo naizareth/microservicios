@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.empowerbiz.clientsservice.mapper.ClientMapper;
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.repository.impl.ClientRepositoryImpl;
 import com.empowerbiz.clientsservice.service.IClientService;
@@ -17,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClientServiceImpl implements IClientService {
 
-    private final ClientMapper clientMapper;
+    //private final ClientMapper clientMapper;
 
     private final ClientRepositoryImpl clientRepositoryimpl;
 
@@ -57,5 +56,5 @@ public class ClientServiceImpl implements IClientService {
     public Client update(Client client) {
         return clientRepositoryimpl.update(client);
     }
-
+    
 }
