@@ -13,6 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class ClientDTO{
+   
+    private long clientId;
 
     @NotBlank(message = "El nombre del cliente no puede estar en blanco")
     private String clientName;
