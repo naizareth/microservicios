@@ -44,13 +44,8 @@ public class ClientController {
 
     @DeleteMapping(Paths.ID_PATH)
     public ResponseEntity<Object> delete(@PathVariable("id") long clientId) {
-        clientValidator.validateClientExists(clientId);
-
-        service.delete(clientId);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", Mesagges.DELETED);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+           
+        return clientManagementService.delateClient(clientId);
     }
 
     @PostMapping

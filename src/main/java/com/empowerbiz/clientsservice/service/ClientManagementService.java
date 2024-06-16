@@ -1,10 +1,14 @@
 package com.empowerbiz.clientsservice.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.empowerbiz.clientsservice.dto.ClientDTO;
 import com.empowerbiz.clientsservice.mapper.ClientMapper;
 import com.empowerbiz.clientsservice.model.Client;
+import com.empowerbiz.clientsservice.util.Mesagges;
 import com.empowerbiz.clientsservice.validators.ClientValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -43,8 +47,20 @@ public class ClientManagementService {
         Client obj = service.update(mapClient);
 
         return responseService.updateResponse(mapper.toDTO(obj));
+                
+    }
 
-        
+    public ResponseEntity<Object> delateClient (Long clientId){
+        clientValidator.validateClientExists(clientId);
+
+        service.delete(clientId);
+
+         Map<String, String> response = new HashMap<>();
+
+        response.put("message", Mesagges.DELETED);
+
+        return responseService.deleteResponse(response);
+
     }
 
 

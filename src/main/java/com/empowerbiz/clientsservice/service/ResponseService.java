@@ -21,4 +21,7 @@ public class ResponseService {
 
      }
 
+     public ResponseEntity<Object> deleteResponse(Object response ){
+      return ResponseEntity.status(HttpStatus.OK).body(response);
+     }
 }
