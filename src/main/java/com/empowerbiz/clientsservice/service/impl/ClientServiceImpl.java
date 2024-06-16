@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClientServiceImpl implements IClientService {
 
-    //private final ClientMapper clientMapper;
-
     private final ClientRepositoryImpl clientRepositoryimpl;
 
     @Override
@@ -29,7 +27,6 @@ public class ClientServiceImpl implements IClientService {
     @Override
     @Transactional(readOnly = true)
     public List<Client> findAll(Long clientId) {
-
         return clientRepositoryimpl.findAll(clientId);
     }
 
@@ -55,6 +52,5 @@ public class ClientServiceImpl implements IClientService {
     @Transactional
     public Client update(Client client) {
         return clientRepositoryimpl.update(client);
-    }
-    
+    } 
 }
