@@ -1,24 +1,37 @@
 package com.empowerbiz.clientsservice.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.empowerbiz.clientsservice.dto.ClientDTO;
 import com.empowerbiz.clientsservice.model.Client;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class ClientMapper {
 
-    public ClientDTO toDTO (Client client){
-        if (client==null){
-            return null;
-        }
-        return new ClientDTO(client.getClientId(),client.getClientName(),client.getEmail(),client.getAddress(),client.getPhone());
+    private final ModelMapper mapper;
+
+    public Client toModel(ClientDTO dto) {
+        return mapper.map(dto, Client.class);
     }
 
-    public Client toEntity (ClientDTO clientDTO){
-        if (clientDTO==null){
-            return null;
-        }
-        return new Client(clientDTO.getClientId(), clientDTO.getClientName(),clientDTO.getEmail(),clientDTO.getAddress(),clientDTO.getPhone());
+    public ClientDTO toDTO (Client client) {
+        
+        return mapper.map(client,ClientDTO.class);
+    }
+
+
+    public List<ClientDTO> toDtoList(List<Client> clients) {
+        return clients.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public List<Client> toModelList(List<ClientDTO> clientDTOs) {
+        return clientDTOs.stream().map(this::toModel).collect(Collectors.toList());
     }
 }

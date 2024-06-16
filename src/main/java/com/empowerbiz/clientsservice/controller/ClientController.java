@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.empowerbiz.clientsservice.dto.ClientDTO;
 import com.empowerbiz.clientsservice.model.Client;
+import com.empowerbiz.clientsservice.service.ClientManagementService;
 import com.empowerbiz.clientsservice.service.IClientService;
 import com.empowerbiz.clientsservice.util.Mesagges;
 import com.empowerbiz.clientsservice.util.Paths;
 import com.empowerbiz.clientsservice.validators.ClientValidator;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,6 +29,9 @@ public class ClientController {
     private final ModelMapper mapper;
 
     private final ClientValidator clientValidator;
+
+    private final ClientManagementService clientManagementService;
+
 
     @GetMapping
     public ResponseEntity<List<ClientDTO>> getClients(@RequestParam(required = false) Long clientId) {
@@ -51,26 +54,12 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody ClientDTO dto) {
-        clientValidator.validateEmailNotInUse(dto.getEmail());
-
-        Client createdClient = service.save(mapper.map(dto, Client.class));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(createdClient, ClientDTO.class));
+    public ResponseEntity<ClientDTO> create(@Validated @RequestBody ClientDTO dto) {
+        return clientManagementService.createClient(dto); 
     }
 
     @PutMapping(Paths.ID_PATH)
-    public ResponseEntity<ClientDTO> update(@PathVariable("id") long clientId, @Validated @RequestBody ClientDTO dto) {
-        Client existingClient = clientValidator.validateClientExists(clientId);
-
-        clientValidator.checkEmailUniqueness(dto.getEmail(), existingClient, clientId);
-
-        Client mapClient = mapper.map(dto, Client.class);
-
-        mapClient.setClientId(clientId);
-
-        Client obj = service.update(mapClient);
-
-        return ResponseEntity.ok().body(mapper.map(obj, ClientDTO.class));
+    public ResponseEntity<ClientDTO> update(@PathVariable("id") long clientId, @Validated @RequestBody ClientDTO dto) {   
+        return clientManagementService.updateClient(clientId,dto);
     }
 }

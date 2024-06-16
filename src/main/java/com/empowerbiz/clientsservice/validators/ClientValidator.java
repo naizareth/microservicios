@@ -8,11 +8,13 @@ import com.empowerbiz.clientsservice.util.Mesagges;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
+@Validated
 public class ClientValidator {
 
 
@@ -29,7 +31,7 @@ public class ClientValidator {
         }
     }
 
-    // Valida que el correo electrónico no esté en uso por otro cliente
+
     public void validateEmailNotInUse(String email) {
         Optional<Client> existingClientOptional = service.findByEmail(email);
         if (existingClientOptional.isPresent()) {
@@ -37,7 +39,7 @@ public class ClientValidator {
         }
     }
 
-    // Verifica que un cliente exista por su ID
+  
     public Client validateClientExists(long clientId) {
         Optional<Client> client = service.findById(clientId);
         if (client.isEmpty()) {
