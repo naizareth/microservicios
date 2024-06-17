@@ -1,19 +1,18 @@
 package com.empowerbiz.clientsservice.repository.impl;
 
-import java.sql.Statement;
-import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+
 import com.empowerbiz.clientsservice.model.Client;
 import com.empowerbiz.clientsservice.repository.IClientRepository;
 import com.empowerbiz.clientsservice.util.SqlQueries;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class ClientRepositoryImpl implements IClientRepository {
 
     @Override
     public Client update(Client client) {
-        
+
         String sql = SqlQueries.UPDATE_CLIENT;
         jdbcTemplate.update(sql, client.getClientName(), client.getEmail(), client.getAddress(), client.getPhone(),
                 client.getClientId());
